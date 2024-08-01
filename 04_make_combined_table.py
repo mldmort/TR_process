@@ -82,8 +82,12 @@ def get_priority(func_str):
 	if func_str == '.':
 		return '.'
 	func_list = func_str.split('&')
-	func_rank_list = [(f, func2rank[f]) for f in func_list]
+	#func_rank_list = [(f, func2rank[f]) for f in func_list]
+	func_rank_list = [(f, func2rank[f]) for f in func_list if f != 'gene']
 	func_rank_list_sorted = sorted(func_rank_list, key=lambda x: x[1], reverse=False) # sorts from small to large
+	# this is for cases with only "gene" annotation
+	if len(func_rank_list_sorted) == 0:
+		return '.'
 	return func_rank_list_sorted[0][0]
 
 df['GENCODE'] = df['GENCODE'].apply(get_priority)
@@ -134,10 +138,10 @@ drop_cols = ['key' , 'CHROM_y', 'POS_y', 'END_y', 'ID_y']
 df.drop(drop_cols, inplace=True, axis=1)
 
 
-df[['case_DENOVO', 'case_DENOVO_MAT', 'case_DENOVO_PAT', 'case_LARGE50_DEV', 'case_LARGE100_DEV', 'case_LARGE500_DEV']] = df[['DENOVO', 'DENOVO_MAT', 'DENOVO_PAT', 'LARGE50_DEV', 'LARGE100_DEV', 'LARGE500_DEV']].apply(get_case, axis=0)
+df[['case_DENOVO', 'case_DENOVO_MAT', 'case_DENOVO_PAT']] = df[['DENOVO', 'DENOVO_MAT', 'DENOVO_PAT']].apply(get_case, axis=0)
 #print(df)
 
-df[['case_ZS_SAMPLES']] = df[['ZS_SAMPLES']].apply(get_case_2, axis=0)
+df[['case_ZS_SAMPLES', 'case_ZS_SAMPLES_PB', 'case_ZS_SAMPLES_ONT', 'case_LARGE25_DEV_GB', 'case_LARGE50_DEV_GB', 'case_LARGE100_DEV_GB', 'case_LARGE500_DEV_GB']] = df[['ZS_SAMPLES', 'ZS_SAMPLES_PB', 'ZS_SAMPLES_ONT', 'LARGE25_DEV_GB', 'LARGE50_DEV_GB', 'LARGE100_DEV_GB', 'LARGE500_DEV_GB']].apply(get_case_2, axis=0)
 
 print('write the final table...')
 df.to_csv(output_file, sep='\t', header=True, index=False)
